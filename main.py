@@ -1,7 +1,6 @@
 import spacy
 import testtext
-import mdutils
-from dateutil.parser import parse
+from mdutils.mdutils import MdUtils
 
 def contains_multiple_words(s):
   return len(s.split()) > 1
@@ -49,7 +48,6 @@ for w in sorted(ents, key=lambda x:-x[1]):
 
 print(testtext.text1)
 
-mdFile = mdutils(file_name='mdoutput')
-mdFile.write(testtest.text1)
-mdFile = create_md_file()
-
+mdFile = MdUtils(file_name='mdoutput')
+mdFile.write(testtext.text1)
+mdFile.create_md_file()
