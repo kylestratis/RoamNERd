@@ -1,0 +1,100 @@
+$spacer: 8px;
+$color-theme-bg: #2e5266;
+$color-theme-page-bg: #9fb1bc;
+$color-theme-text: #9ee493;
+
+html,
+body {
+  min-height: 100%;
+  width: 100%;
+}
+
+header {
+  height: 8vh;
+  padding: 0 $spacer * 3;
+  background: $color-theme-bg;
+  border-bottom: 1px black;
+  color: $color-theme-text;
+
+  h1 {
+    font-size: 24px;
+    line-height: 8vh;
+    font-family: monospace;
+    margin: 0;
+  }
+}
+
+main {
+  max-width: 1000px;
+  min-height: calc(
+    84vh - #{$spacer * 6}
+  ); // this is a hack so the page is always 100vh
+  margin: 0 auto;
+  padding: $spacer * 3;
+
+  form {
+    display: flex;
+    justify-content: space-between;
+    height: 100%;
+
+    textarea {
+      outline: none;
+      width: 30%;
+      height: 400px;
+      flex-grow: 1;
+      resize: none;
+      padding: $spacer * 2;
+      border-radius: $spacer;
+      border: 1px solid $color-theme-bg;
+      overflow-y: auto;
+    }
+
+    #actions {
+      button {
+        display: block;
+        width: 100%;
+        margin-bottom: $spacer;
+      }
+    }
+
+    .spacer {
+      margin: 0 $spacer * 2;
+    }
+  }
+}
+
+button {
+  border: 1px solid black;
+  border-radius: $spacer;
+  background-color: $color-theme-text;
+  color: black;
+  padding: $spacer;
+  font-size: 14px;
+  cursor: pointer;
+
+  &:hover {
+    filter: contrast(1.5);
+  }
+
+  &.secondary {
+    background-color: $color-theme-bg;
+    color: $color-theme-page-bg;
+  }
+}
+
+footer {
+  height: 8vh;
+  line-height: 8vh;
+  padding: 0 $spacer * 3;
+  background-color: $color-theme-bg;
+  color: white;
+
+  a {
+    color: $color-theme-text;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
