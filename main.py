@@ -1,5 +1,8 @@
 import spacy
 import testtext
+import sys
+import datetime
+from dateutil.parser import parse
 from mdutils.mdutils import MdUtils
 
 def contains_multiple_words(s):
@@ -18,6 +21,33 @@ nlp = spacy.load('en_core_web_sm')
 doc = nlp(testtext.text1)
 ents = []
 entsText = []
+
+def parsing_date(dat):
+  try:
+    parse(dat)
+    rmdt = parse(dat)
+  except:
+    rmdt = dat
+  return rmdt
+
+def suffix(d):
+    return "th" if 11 <= d <= 13 else {1: "st", 2: "nd", 3: "rd"}.get(d % 10, "th")
+
+def roam_strftime(fmt, t):
+    return t.strftime(fmt).replace("{S}", str(t.day) + suffix(t.day))
+
+def roam_date(dat):
+  try:
+    parse(dat)
+    rmdt = parse(dat)
+    if type(rmdt) is datetime.datetime:
+      return [roam_strftime("%B {S}, %Y", rmdt)]
+    else:
+      rmdt = dat
+  except:
+    rmdt = dat
+  return rmdt
+
 
 for e in doc.ents:
 
