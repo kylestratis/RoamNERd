@@ -22,14 +22,6 @@ doc = nlp(testtext.text1)
 ents = []
 entsText = []
 
-def parsing_date(dat):
-  try:
-    parse(dat)
-    rmdt = parse(dat)
-  except:
-    rmdt = dat
-  return rmdt
-
 def suffix(d):
     return "th" if 11 <= d <= 13 else {1: "st", 2: "nd", 3: "rd"}.get(d % 10, "th")
 
