@@ -2,6 +2,7 @@ import React, { useMemo } from "react";
 import styled from "styled-components";
 import ReactMarkdown from "react-markdown";
 import { useToasts } from "react-toast-notifications";
+import ReactGA from "react-ga";
 import Button from "./components/Button";
 import { copyTextToClipboard } from "./utils/clipboard";
 import { download } from "./utils/download";
@@ -61,15 +62,27 @@ function OutputZone({ text }: Props) {
       addToast("Copied to clipboard", {
         appearance: "success",
       });
+      ReactGA.event({
+        category: "TagText",
+        action: "Copy Text",
+      });
     } catch (e) {
       addToast("Failed to copy", {
         appearance: "error",
+      });
+      ReactGA.event({
+        category: "TagText",
+        action: "Copy Text Fail",
       });
     }
   };
 
   const downloadOutput = () => {
     download("roamNERd.md", text);
+    ReactGA.event({
+      category: "TagText",
+      action: "Download File",
+    });
   };
 
   return (

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { useToasts } from "react-toast-notifications";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import ReactGA from "react-ga";
 
 const DropZoneTag = styled.div<{ active: boolean }>`
   display: flex;
@@ -60,10 +61,18 @@ function DropZone({ setText }: Props) {
           if (e?.target?.result) {
             const text = e.target.result as string;
             setText(text);
+            ReactGA.event({
+              category: "TagText",
+              action: "Upload file",
+            });
           }
         };
         reader.readAsText(file);
       } else {
+        ReactGA.event({
+          category: "TagText",
+          action: "Upload Fail",
+        });
         setIsDropZoneHovered(false);
         addToast("File must be text", {
           appearance: "error",
@@ -83,6 +92,10 @@ function DropZone({ setText }: Props) {
     } else {
       handleFile(ev.dataTransfer.files[0]);
     }
+    ReactGA.event({
+      category: "TagText",
+      action: "Drop File",
+    });
   };
 
   return (

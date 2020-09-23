@@ -5,6 +5,7 @@ import { useToasts } from "react-toast-notifications";
 import Button from "./components/Button";
 import InputZone from "./InputZone";
 import OutputZone from "./OutputZone";
+import ReactGA from "react-ga";
 
 const API_URL = "https://roamnerd-be.herokuapp.com";
 const TAG_TEXT_ENDPOINT = "tagText";
@@ -68,6 +69,10 @@ function App() {
     e.preventDefault(); // normally forms submit a POST request and refresh the page
     setIsProcessing(true);
     try {
+      ReactGA.event({
+        category: "TagText",
+        action: "Process Text",
+      });
       const res = await fetch(`${API_URL}/${TAG_TEXT_ENDPOINT}`, {
         method: "POST",
         headers: {
