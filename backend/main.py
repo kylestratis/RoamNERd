@@ -13,7 +13,7 @@ def tag_text():
     pdb.set_trace()
     if request.method == 'POST':
         posted_text = request.get_json()
-        text = posted_text['text']
+        text = posted_text["text"]
         return main(text)
 
 ## Our main function, and how you access our backend. For now, we only
@@ -221,6 +221,10 @@ def generateMarkdown(text, pages):
     return markdownRaw
     pdb.set_trace()
 
+# api index page
+@app.route('/')
+def index():
+    return "<h1>RoamNERd API</h1>"
 
 # Some Flask stuff I don't quite understand
 if __name__ == "__main__":
