@@ -2,13 +2,8 @@
 import spacy
 from dateutil.parser import parse
 from flask import Flask, request
-from flask_cors import CORS
-
-## DEBUG:
-import pdb
 
 app = Flask(__name__)
-CORS(app)
 
 @app.route("/tagText", methods=["POST"])
 def tag_text():
@@ -65,7 +60,7 @@ def main(rawInput):
             processDefault(word, doc, pages["Geopolitical Entities"], pages, readableCategories, removedPages)
 
     annotatedText = docToRoam(doc, pages)
-    return([annotatedText, generateMarkdown(annotatedText, pages)])
+    return(generateMarkdown(annotatedText, pages))
 
 ## A function for processing people identified by our model. Handles repeats, mononyms, honorifics
 ## and misattribution
@@ -220,7 +215,6 @@ def generateMarkdown(text, pages):
     ## Now, lets add our raw roam blocks + pages
     markdownRaw += "***Raw Text:** " + "  \n" + "    -" + text
     return markdownRaw
-    pdb.set_trace()
 
 # api index page
 @app.route('/')
