@@ -2,8 +2,10 @@
 import spacy
 from dateutil.parser import parse
 from flask import Flask, request
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 @app.route("/tagText", methods=["POST"])
 def tag_text():
