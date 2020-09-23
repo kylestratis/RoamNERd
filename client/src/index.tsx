@@ -6,6 +6,7 @@ import Header from "./Header";
 import Footer from "./Footer";
 import * as serviceWorker from "./serviceWorker";
 import { ThemeProvider } from "styled-components";
+import { theme } from "./Theme";
 import { ToastProvider } from "react-toast-notifications";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import {
@@ -27,17 +28,6 @@ library.add(
   faTimes,
   faComment
 );
-
-const theme = {
-  spacer: 8,
-  color: {
-    primary: "#2e5266",
-    secondary: "#9ee493",
-  },
-  // $color-theme-bg:;
-  // $color-theme-page-bg: #9fb1bc;
-  // $color-theme-text: ;
-};
 
 ReactDOM.render(
   <React.StrictMode>
