@@ -6,6 +6,7 @@ import Header from "./Header";
 import Footer from "./Footer";
 import * as serviceWorker from "./serviceWorker";
 import { ThemeProvider } from "styled-components";
+import { ToastProvider } from "react-toast-notifications";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import {
   faSpinner,
@@ -14,9 +15,18 @@ import {
   faCopy,
   faCogs,
   faTimes,
+  faComment,
 } from "@fortawesome/free-solid-svg-icons";
 
-library.add(faSpinner, faUpload, faDownload, faCopy, faCogs, faTimes);
+library.add(
+  faSpinner,
+  faUpload,
+  faDownload,
+  faCopy,
+  faCogs,
+  faTimes,
+  faComment
+);
 
 const theme = {
   spacer: 8,
@@ -33,7 +43,9 @@ ReactDOM.render(
   <React.StrictMode>
     <ThemeProvider theme={theme}>
       <Header />
-      <App />
+      <ToastProvider>
+        <App />
+      </ToastProvider>
       <Footer />
     </ThemeProvider>
   </React.StrictMode>,

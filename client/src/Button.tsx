@@ -58,29 +58,42 @@ function Button({
   children,
   icon,
   className,
+  loading = false,
+  loadingContent,
 }: Props) {
+  const canInvoke = !disabled && !loading;
   return (
     <ButtonTag
-      onClick={!disabled ? onClick : () => {}}
+      onClick={canInvoke ? onClick : () => {}}
       type={type}
       btnTheme={theme}
       disabled={disabled}
       className={className}
     >
-      {icon && <BtnIcon icon={icon} />}
-      {children}
+      {!loading ? (
+        <>
+          {icon && <BtnIcon fixedWidth icon={icon} />} {children}
+        </>
+      ) : (
+        <>
+          <BtnIcon fixedWidth icon="spinner" spin />{" "}
+          {loadingContent || children}
+        </>
+      )}
     </ButtonTag>
   );
 }
 
 type Props = {
-  onClick?: () => void;
+  onClick?: (evt: React.MouseEvent<HTMLElement, MouseEvent>) => void;
   disabled?: boolean;
   type?: "button" | "submit" | "reset";
   theme?: "primary" | "secondary";
   children?: React.ReactNode;
   icon?: IconProp;
   className?: string;
+  loading?: boolean;
+  loadingContent?: React.ReactNode;
 };
 
 export default Button;

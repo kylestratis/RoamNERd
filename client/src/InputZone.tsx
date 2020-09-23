@@ -14,7 +14,17 @@ const InputTextarea = styled.textarea`
   flex-grow: 1;
 `;
 
-function InputZone({ text, setText }: Props) {
+const FrozenInput = styled.div`
+  font-size: 12px;
+  font-family: serif;
+  color: black;
+  flex-grow: 1;
+`;
+
+function InputZone({ text, setText, frozen }: Props) {
+  if (frozen) {
+    return <FrozenInput>{text}</FrozenInput>;
+  }
   return (
     <>
       {!text.length && <DropZone setText={setText} />}
@@ -31,6 +41,7 @@ function InputZone({ text, setText }: Props) {
 type Props = {
   text: string;
   setText: (i: string) => void;
+  frozen: boolean;
 };
 
 export default InputZone;

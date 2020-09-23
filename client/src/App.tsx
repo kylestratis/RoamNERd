@@ -1,8 +1,13 @@
 import React, { useState } from "react";
 import "./App.scss";
 import styled from "styled-components";
+import { useToasts } from "react-toast-notifications";
 import Button from "./Button";
 import InputZone from "./InputZone";
+import OutputZone from "./OutputZone";
+
+const API_URL = "https://roamnerd-be.herokuapp.com";
+const TAG_TEXT_ENDPOINT = "tagText";
 
 const Main = styled.main`
   max-width: 1000px;
@@ -32,40 +37,67 @@ const IOSection = styled.div`
 
 const IOSectionActionBar = styled.div``;
 
-const OutputZone = styled.div`
-  flex-grow: 1;
-  overflow-y: auto;
-  font-size: 12px;
-  font-family: serif;
-  color: black;
-`;
-
 const Actions = styled.div`
   align-self: center;
 `;
 
 function App() {
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault(); // normally forms submit a POST request and refresh the page
-  };
+  const { addToast } = useToasts();
   const [inputText, setInputText] = useState("");
   const hasInput = inputText.length > 0;
   const [outputText, setOutputText] = useState("");
   const hasOutput = outputText.length > 0;
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault(); // normally forms submit a POST request and refresh the page
+    setIsProcessing(true);
+    try {
+      const res = await fetch(`${API_URL}/${TAG_TEXT_ENDPOINT}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          text: inputText,
+        }),
+        mode: "no-cors",
+      });
+      const json = await res.json();
+      console.log(json);
+    } catch (e) {
+      console.log(e);
+      addToast("A server error occured, sorry about that", {
+        appearance: "error",
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
   return (
     <Main>
       <Form onSubmit={onSubmit}>
         <IOSection>
-          <InputZone text={inputText} setText={setInputText} />
+          <InputZone
+            text={inputText}
+            setText={setInputText}
+            frozen={isProcessing}
+          />
         </IOSection>
         <Actions>
-          <Button icon="cogs" type="submit" disabled={!hasInput}>
+          <Button
+            icon="cogs"
+            type="submit"
+            disabled={!hasInput}
+            loading={isProcessing}
+            loadingContent="Processing..."
+          >
             Process Text
           </Button>
         </Actions>
         <IOSection>
-          <OutputZone>Tagged output will go here</OutputZone>
+          <OutputZone text={outputText} />
           <IOSectionActionBar>
             <Button
               icon="download"
