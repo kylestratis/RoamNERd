@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import styled from "styled-components";
+import { useToasts } from "react-toast-notifications";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const DropZoneTag = styled.div<{ active: boolean }>`
@@ -47,18 +48,27 @@ const FileInput = styled.input`
 `;
 
 function DropZone({ setText }: Props) {
+  const { addToast } = useToasts();
   const [isDropZoneHovered, setIsDropZoneHovered] = useState(false);
 
   const handleFile = (file: File | null) => {
     if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        if (e?.target?.result) {
-          const text = e.target.result as string;
-          setText(text);
-        }
-      };
-      reader.readAsText(file);
+      console.log(file.type);
+      if (file.type === "text/plain" || file.type === "text/markdown") {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          if (e?.target?.result) {
+            const text = e.target.result as string;
+            setText(text);
+          }
+        };
+        reader.readAsText(file);
+      } else {
+        setIsDropZoneHovered(false);
+        addToast("File must be text", {
+          appearance: "error",
+        });
+      }
     }
   };
 
