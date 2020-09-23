@@ -1,63 +1,193 @@
+## Imports
 import spacy
+from dateutil.parser import parse
 from flask import Flask, request
+
+## DEBUG:
+import pdb
 
 app = Flask(__name__)
 
 @app.route("/tagText", methods=["POST"])
 def tag_text():
+    pdb.set_trace()
     if request.method == 'POST':
         posted_text = request.get_json()
         text = posted_text['text']
         return main(text)
 
+## Our main function, and how you access our backend. For now, we only
+## pass it text but eventually it will also parse a bunch of optional args
+def main(rawInput):
 
-def contains_multiple_words(s):
-    return len(s.split()) > 1
+    # Load our model and run it against our input string
+    nlp = spacy.load("en_core_web_sm")
+    doc = nlp(rawInput)
+
+    ## Let's make a list of spacy categories we want to grab
+    spacyCategories = ["PERSON", "DATE", "LOC", "EVENT", "ORG","GPE"]
+    readableCategories = ["People", "Dates", "Locations", "Organisations", "Geopolitical Entities"]
+
+    # We should also generate a dictionary of roam pages by category where we can store our tags in plaintext
+    # This will make it easier to count our tags later on.
+    pages = {
+            "People" : [],
+             "Dates" : [],
+             "Locations" : [],
+             "Organisations" : [],
+             "Geopolitical Entities" : []
+             }
 
 
-def has_prefix(text, prefix):
-    return text.startswith(prefix)
+    # Finally, we're also going to make a list of removed pages - this is so we
+    # have to cross reference our whole doc if we remove tag but it keeps popping up.
+    # We don't have to worry about sorting this one by category.
+    removedPages = []
 
+    ## Loop through our identified words
+    for word in doc.ents:
 
-def remove_prefix(text, prefix):
-    return text[text.startswith(prefix) and len(prefix):]
-
-
-def main(textInput):
-    textOutput = {}
-    nlp = spacy.load('en_core_web_sm')
-    doc = nlp(textInput)
-    entities = []
-    for e in doc.ents:
-
-        # ignore numerical labels
-        if e.label_ == 'PERCENT' or e.label_ == 'MONEY' or e.label_ == 'TIME' or e.label_ == 'CARDINAL' or e.label_ == 'ORDINAL' or e.label_ == 'QUANTITY':
+        ## First, let's only grab words that have the labels we want
+        if (word.label_ not in spacyCategories):
             continue
 
-        # ignore 'PERSON' labels with one word
-        elif e.label_ == 'PERSON':
-            if not contains_multiple_words(e.text):
-                continue
-            else:
-                e.text.capitalize()
-                entities.append((e.text, e.start_char, e.end_char, e.label_))
+        # I though about implementing a switch statement in python, but they're not
+        # terribly readable in Python. We'll go with elifs
+        if (word.label_ == "PERSON"):
+            processPerson(word, doc, pages["People"], removedPages)
+        elif (word.label_ == "DATE"):
+            processDate(word, doc, pages["Dates"], removedPages)
+        elif (word.label_ == "LOC"):
+            processDefault(word, doc, pages["Locations"], pages, readableCategories, removedPages)
+        elif (word.label_ == "ORG"):
+            processDefault(word, doc, pages["Organisations"], pages, readableCategories, removedPages, )
+        elif (word.label_ == "GPE"):
+            processDefault(word, doc, pages["Geopolitical Entities"], pages, readableCategories, removedPages)
 
-        # remove 'the ' prefix from entities
-        else:
-            if has_prefix(e.text, 'the '):
-                e_no_prefix = remove_prefix(e.text, 'the ')
-                e_startChar = e.start_char + 4
-                entities.append((e_no_prefix, e_startChar, e.end_char, e.label_))
-            else:
-                entities.append((e.text, e.start_char, e.end_char, e.label_))
+    ## Now we've mapped everything, we can write back out to raw text. We'll use the
+    ## sentence detection from spacy
+    allPages = []
+    for category in readableCategories:
+        allPages += pages[category]
 
-    # work backwards through entities, append sq. brackets
-    for w in sorted(entities, key=lambda x: -x[1]):
-        textOutputString = textInput[:w[1]] + '[[' + textInput[w[1]:w[2]] + ']]' + textInput[w[2]:]
-        textOutput.update(text=textOutputString)
+    ## My method for writing to a string. It's not quite as I'd like it yet,
+    ## but it'll work for MVP
+    roamText = []
+    sentences = [sent.text for sent in list(doc.sents)]
+    for sentence in sentences:
+        for page in allPages:
+            if page in sentence:
+                ## Making sure we don't double tag things
+                if ("[["+page+"]]") not in sentence:
+                    sentence = sentence.replace(page, roamPagify(page))
 
-    return textOutput
+        roamText.append(sentence)
 
+    roamText = "\n".join(roamText)
+    return(roamText)
+
+## A function for processing people identified by our model. Handles repeats, mononyms, honorifics
+## and misattribution
+def processPerson(person, doc, pages, removedPages):
+
+    # A generic list of common english-language honorifics
+    honorifics = ["Mr", "Mr.", "Ms", "Ms.", "Mrs", "Mrs."]
+
+    # First, lets check for repeats:
+    if person.text in pages:
+        return
+
+    ## Handle punctuation first - this is a bit lazy and deserves revisiting but:
+    ## if the final character is punctuation, we'll just throw it out. I guess we can call
+    ## it a misattribution.
+    if (person[-1].pos_ == "PUNCT"):
+        removedPages.append(person.text)
+        return
+
+    # Handling mononyms - if a more specific version of the same name exists in doc, return.
+    if len(person) == 1 and person.text not in removedPages:
+
+       # Let's grab a list of all people in the doc, and we can cross-reference names.
+       people = [ent for ent in doc.ents if ent.label_ == "PERSON"]
+       for entry in people:
+           # Let's look at every name in our list, and see if they share a last name with our mononym. If so,
+           # we'll remove the mononym and add it do the removedPages list, Else, we add it
+           if entry[-1].text == person.text:
+               removedPages.append(person.text)
+               return
+
+           if entry[0].text == person.text:
+               removedPages.append(person.text)
+               return
+
+
+
+    # Now, let's deal with honorifics:
+    if(person[0].text in honorifics):
+       # A short list of common honorifics - these will do for now but could do with expanding.
+       people = [ent for ent in doc.ents if ent.label_ == "PERSON"]
+       for entry in people:
+           if(entry[-1].text == person[-1].text):
+               removedPages.append(person.text)
+               return
+
+    # Checking that our names aren't all caps or all lower-case:
+    for word in person:
+        if (word.text == word.text.upper() or word.text == word.text.lower()):
+            removedPages.append(person.text)
+            return
+
+    ## And finally, if we haven't filtered the tag out, we can add it as a page
+    pages.append(person.text)
+    return
+
+## A function for processing dates identified by our model. Filters out dates that can't be parsed sensibly
+## by dateutil
+def processDate(date, doc, pages, removedPages):
+    # Add more edge case handling in future!
+    if(date.text in removedPages or date.text in pages):
+        return
+    if(len(date.text) < 4):
+        return
+    try:
+        parse(date.text)
+        pages.append(date.text)
+        print(dateObject)
+
+    except:
+        removedPages.append(date.text)
+        return
+
+## A default processing function for categories we haven't mapped edge
+## cases for yet. Does basic grammatic / logical filtering, and makes sure it's
+## results don't show up in other lists.
+def processDefault(word, doc, pages, pageDictionary, categories, removedPages):
+
+    if word.text in removedPages or word.text in pages:
+        return
+
+    # Check capitalisation
+    for token in word:
+        if (word.text == word.text.upper() or word.text == word.text.lower()):
+            removedPages.append(word.text)
+            return
+
+    # Check page doesn't already exist in wider dictionary
+    for category in categories:
+        for page in pageDictionary[category]:
+            for token in page.split(" "):
+                if word[-1].text == token:
+                    removedPages.append(word.text)
+                    return
+
+
+
+    pages.append(word.text)
+    return
+
+##Takes a given string and converts it into a Roam page: "Roam" -> "[[Roam]]"
+def roamPagify(string):
+    return "[["+string+"]]"
 
 if __name__ == "__main__":
     app.run(debug=True)
