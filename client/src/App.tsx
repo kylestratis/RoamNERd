@@ -49,8 +49,6 @@ const IOSection = styled.div`
   }
 `;
 
-const IOSectionActionBar = styled.div``;
-
 const Actions = styled.div`
   align-self: center;
 
@@ -64,7 +62,6 @@ function App() {
   const [inputText, setInputText] = useState("");
   const hasInput = inputText.length > 0;
   const [outputText, setOutputText] = useState("");
-  const hasOutput = outputText.length > 0;
   const [isProcessing, setIsProcessing] = useState(false);
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -116,19 +113,6 @@ function App() {
         </Actions>
         <IOSection>
           <OutputZone text={outputText} />
-          <IOSectionActionBar>
-            <Button
-              icon="download"
-              theme="secondary"
-              type="submit"
-              disabled={!hasOutput}
-            >
-              Download as .md
-            </Button>
-            <Button icon="copy" theme="secondary" disabled={!hasOutput}>
-              Copy Output
-            </Button>
-          </IOSectionActionBar>
         </IOSection>
       </Form>
     </Main>
