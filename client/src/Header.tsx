@@ -1,5 +1,11 @@
 import React from "react";
 import styled from "styled-components";
+import { FeedbackForm } from "feedback-fish";
+import Button from "./Button";
+
+const FeedbackButton = styled(Button)`
+  display: inline-block;
+`;
 
 const HeaderTag = styled.header`
   height: 9vh;
@@ -7,6 +13,12 @@ const HeaderTag = styled.header`
   background: ${(props) => props.theme.color.primary};
   border-bottom: 1px black;
   color: ${(props) => props.theme.color.secondary};
+  display: flex;
+  align-items: center;
+`;
+
+const WordMarkContainer = styled.div`
+  margin-right: auto;
 `;
 
 const WordMark = styled.h1`
@@ -29,11 +41,23 @@ const Description = styled.h2`
 function Header() {
   return (
     <HeaderTag>
-      <WordMark>RoamNERd</WordMark>
-      <Description>
-        Automatically tag named entities in text for direct entry into Roam
-        Research.
-      </Description>
+      <WordMarkContainer>
+        <WordMark>RoamNERd</WordMark>
+        <Description>
+          Automatically tag named entities in text for direct entry into Roam
+          Research.
+        </Description>
+      </WordMarkContainer>
+      <FeedbackForm
+        projectId="9226fb99669361"
+        triggerComponent={(props: {
+          onClick: (evt: React.MouseEvent<HTMLElement, MouseEvent>) => void;
+        }) => (
+          <FeedbackButton icon="comment" {...props}>
+            Give Feedback
+          </FeedbackButton>
+        )}
+      />
     </HeaderTag>
   );
 }

@@ -18,15 +18,27 @@ const OutputZoneTag = styled.div`
   }
 `;
 
+const PLACEHOLDER_MD = `
+**\\[\\[RoamNERd\\]\\]** uses \\[\\[machine learning\\]\\] to tag entities so you can seamlessly import text into \\[\\[Roam Research\\]\\].
+
+Usage:
+
+1. Enter or upload some text on the left
+2. Hit "Process Text"
+3. Export using the buttons below
+`;
+
 function OutputZone({ text }: Props) {
   const transformedMD = useMemo(() => {
     var transformText = text.replace(/\[\[/gi, `\\[\\[`);
     return transformText.replace(/\]\]/gi, `\\]\\]`);
   }, [text]);
-  console.log(transformedMD);
+
+  const usePlaceholder = transformedMD.length === 0;
+
   return (
     <OutputZoneTag>
-      <ReactMarkdown source={transformedMD} />
+      <ReactMarkdown source={usePlaceholder ? PLACEHOLDER_MD : transformedMD} />
     </OutputZoneTag>
   );
 }
