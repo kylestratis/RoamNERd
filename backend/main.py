@@ -43,7 +43,6 @@ def main(rawInput):
     # have to cross reference our whole doc if we remove tag but it keeps popping up.
     # We don't have to worry about sorting this one by category.
     removedPages = []
-
     ## Loop through our identified words
     for word in doc.ents:
 
@@ -64,27 +63,8 @@ def main(rawInput):
         elif (word.label_ == "GPE"):
             processDefault(word, doc, pages["Geopolitical Entities"], pages, readableCategories, removedPages)
 
-    ## Now we've mapped everything, we can write back out to raw text. We'll use the
-    ## sentence detection from spacy
-    allPages = []
-    for category in readableCategories:
-        allPages += pages[category]
-
-    ## My method for writing to a string. It's not quite as I'd like it yet,
-    ## but it'll work for MVP
-    roamText = []
-    sentences = [sent.text for sent in list(doc.sents)]
-    for sentence in sentences:
-        for page in allPages:
-            if page in sentence:
-                ## Making sure we don't double tag things
-                if ("[["+page+"]]") not in sentence:
-                    sentence = sentence.replace(page, roamPagify(page))
-
-        roamText.append(sentence)
-
-    roamText = "\n".join(roamText)
-    return(roamText)
+    annotatedText = docToRoam(doc, pages)
+    return([annotatedText, generateMarkdown(annotatedText, pages)])
 
 ## A function for processing people identified by our model. Handles repeats, mononyms, honorifics
 ## and misattribution
@@ -185,9 +165,63 @@ def processDefault(word, doc, pages, pageDictionary, categories, removedPages):
     pages.append(word.text)
     return
 
-##Takes a given string and converts it into a Roam page: "Roam" -> "[[Roam]]"
+## Takes a given string and converts it into a Roam page: "Roam" -> "[[Roam]]"
 def roamPagify(string):
     return "[["+string+"]]"
 
+## Writes from doc to roam output. Returns a string
+def docToRoam(doc, pages):
+
+    roamOut = []
+    sentences = doc.sents
+
+    allPages = []
+    for page in pages.values():
+        allPages += page
+
+    for sentence in sentences:
+        replaceBuffer = []
+        roamBlock = sentence.text
+
+        # Let's grab all of the ents, and if they're in the doc
+        # we can add them to a buffer
+        for ent in sentence.ents:
+            if ent.text in allPages:
+                replaceBuffer.append(ent.text)
+
+        for page in replaceBuffer:
+            roamBlock = roamBlock.replace(page, roamPagify(page))
+
+
+        roamOut.append(roamBlock)
+
+    return("\n   -".join(roamOut))
+
+## Generates a .md string with header
+def generateMarkdown(text, pages):
+
+    # Building the header
+    markdownRaw = "***Tags:**\n"
+    for category in pages.items():
+        if(len(category[1]) == 0):
+            continue
+        ## First, lets make the category label and the count
+        markdownRaw += "    -" + "__"+category[0]+"__" + ": " + str(len(category[1])) + "  \n"
+
+        ## Now, we can add our list of pages, formatted as a string
+        pageString = []
+        for page in category[1]:
+            pageString.append(roamPagify(page))
+        pageString = ", ".join(pageString)
+
+        markdownRaw += "        -"+pageString + "  \n"
+
+    ## Now, lets add our raw roam blocks + pages
+    markdownRaw += "***Raw Text:** " + "  \n" + "    -" + text
+    return markdownRaw
+    pdb.set_trace()
+
+
+# Some Flask stuff I don't quite understand
 if __name__ == "__main__":
     app.run(debug=True)
