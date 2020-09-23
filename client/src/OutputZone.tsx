@@ -4,6 +4,7 @@ import ReactMarkdown from "react-markdown";
 import { useToasts } from "react-toast-notifications";
 import Button from "./components/Button";
 import { copyTextToClipboard } from "./utils/clipboard";
+import { download } from "./utils/download";
 
 const OutputZoneTag = styled.div`
   flex-grow: 1;
@@ -57,6 +58,10 @@ function OutputZone({ text }: Props) {
     }
   };
 
+  const downloadOutput = () => {
+    download("roamNERd.md", text);
+  };
+
   return (
     <>
       <OutputZoneTag>
@@ -66,6 +71,7 @@ function OutputZone({ text }: Props) {
       </OutputZoneTag>
       <IOSectionActionBar>
         <Button
+          onClick={downloadOutput}
           icon="download"
           theme="secondary"
           type="submit"
