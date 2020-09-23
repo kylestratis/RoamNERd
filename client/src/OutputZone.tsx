@@ -24,6 +24,16 @@ const OutputZoneTag = styled.div`
 
 const IOSectionActionBar = styled.div``;
 
+const Disclaimer = styled.p`
+  margin: 0;
+  margin-bottom: ${({ theme }) => theme.spacer / 2}px;
+  padding: 0;
+  font-size: 12px;
+  color: grey;
+
+  border-bottom: 1px solid grey;
+`;
+
 const PLACEHOLDER_MD = `
 **\\[\\[RoamNERd\\]\\]** uses \\[\\[named entity recognition\\]\\] to tag entities so you can seamlessly import text into \\[\\[Roam Research\\]\\].
 
@@ -64,6 +74,13 @@ function OutputZone({ text }: Props) {
 
   return (
     <>
+      {hasOutput && (
+        <Disclaimer>
+          Disclaimer: the output preview does not correctly reflect Roam's
+          renderer, and will be buggy. The output is crafted to work correctly
+          in Roam.
+        </Disclaimer>
+      )}
       <OutputZoneTag>
         <ReactMarkdown
           source={usePlaceholder ? PLACEHOLDER_MD : transformedMD}

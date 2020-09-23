@@ -20,7 +20,7 @@ const FooterTag = styled.footer`
 function Footer() {
   return (
     <FooterTag>
-      Built with {"</>"} by{" "}
+      Built with {"</>"} by [[
       <a
         href="https://twitter.com/igorlenterman"
         target="blank"
@@ -28,18 +28,19 @@ function Footer() {
       >
         @igorlenterman
       </a>
-      ,{" "}
+      ]] , [[
       <a href="https://twitter.com/bvajresh" target="blank" rel="noreferrer">
         @bvajresh
       </a>
-      ,{" "}
+      ]] , [[
       <a href="https://twitter.com/adamtowerz" target="blank" rel="noreferrer">
         @adamtowerz
       </a>
-      , and{" "}
+      ]] , and [[
       <a href="https://twitter.com/hmprt_eth" target="blank" rel="noreferrer">
         @hmprt_eth
       </a>
+      ]]
     </FooterTag>
   );
 }
