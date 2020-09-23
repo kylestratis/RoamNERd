@@ -19,11 +19,11 @@ const OutputZoneTag = styled.div`
 `;
 
 const PLACEHOLDER_MD = `
-**\\[\\[RoamNERd\\]\\]** uses \\[\\[machine learning\\]\\] to tag entities so you can seamlessly import text into \\[\\[Roam Research\\]\\].
+**\\[\\[RoamNERd\\]\\]** uses \\[\\[named entity recognition\\]\\] to tag entities so you can seamlessly import text into \\[\\[Roam Research\\]\\].
 
 Usage:
 
-1. Enter or upload some text on the left
+1. Enter or upload some text
 2. Hit "Process Text"
 3. Export using the buttons below
 `;

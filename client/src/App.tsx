@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "./App.scss";
 import styled from "styled-components";
 import { useToasts } from "react-toast-notifications";
-import Button from "./Button";
+import Button from "./components/Button";
 import InputZone from "./InputZone";
 import OutputZone from "./OutputZone";
 
@@ -10,21 +10,29 @@ const API_URL = "https://roamnerd-be.herokuapp.com";
 const TAG_TEXT_ENDPOINT = "tagText";
 
 const Main = styled.main`
-  max-width: 1000px;
-  min-height: calc(84vh - ${(props) => props.theme.spacer * 6}px);
+  max-width: 1200px;
+  flex-grow: 1;
   margin: 0 auto;
   padding: ${(props) => props.theme.spacer * 3}px;
+
+  @media ${({ theme }) => theme.devices.mobile} {
+    padding: ${(props) => props.theme.spacer}px;
+  }
 `;
 
 const Form = styled.form`
   display: flex;
   justify-content: space-between;
   height: 100%;
+
+  @media ${({ theme }) => theme.devices.mobile} {
+    flex-direction: column;
+  }
 `;
 
 const IOSection = styled.div`
   flex-grow: 1;
-  width: 300px;
+  width: 400px;
   height: 400px;
   display: flex;
   flex-direction: column;
@@ -33,12 +41,22 @@ const IOSection = styled.div`
   box-sizing: border-box;
   border-radius: ${(props) => props.theme.spacer}px;
   border: 1px solid ${(props) => props.theme.color.primary};
+
+  @media ${({ theme }) => theme.devices.mobile} {
+    width: auto;
+    margin: 0;
+    height: 300px;
+  }
 `;
 
 const IOSectionActionBar = styled.div``;
 
 const Actions = styled.div`
   align-self: center;
+
+  @media ${({ theme }) => theme.devices.mobile} {
+    padding: ${(props) => props.theme.spacer}px;
+  }
 `;
 
 function App() {
