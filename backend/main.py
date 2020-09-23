@@ -2,6 +2,7 @@
 import spacy
 from dateutil.parser import parse
 from flask import Flask, request
+from flask_cors import CORS
 
 ## DEBUG:
 import pdb
