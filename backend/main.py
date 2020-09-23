@@ -193,7 +193,7 @@ def docToRoam(doc, pages):
 
         roamOut.append(roamBlock)
 
-    return("\n   -".join(roamOut))
+    return("\n   - ".join(roamOut))
 
 ## Generates a .md string with header
 def generateMarkdown(text, pages):
@@ -204,7 +204,7 @@ def generateMarkdown(text, pages):
         if(len(category[1]) == 0):
             continue
         ## First, lets make the category label and the count
-        markdownRaw += "    -" + "__"+category[0]+"__" + ": " + str(len(category[1])) + "  \n"
+        markdownRaw += "    - " + "__"+category[0]+"__" + ": " + str(len(category[1])) + "  \n"
 
         ## Now, we can add our list of pages, formatted as a string
         pageString = []
@@ -212,10 +212,10 @@ def generateMarkdown(text, pages):
             pageString.append(roamPagify(page))
         pageString = ", ".join(pageString)
 
-        markdownRaw += "        -"+pageString + "  \n"
+        markdownRaw += "        - "+pageString + "  \n"
 
     ## Now, lets add our raw roam blocks + pages
-    markdownRaw += "***Raw Text:** " + "  \n" + "    -" + text
+    markdownRaw += "***Raw Text:** " + "  \n" + "    - " + text
     return markdownRaw
 
 # api index page
