@@ -221,6 +221,10 @@ def generateMarkdown(text, pages):
     return markdownRaw
     pdb.set_trace()
 
+# api index page
+@app.route('/')
+def index():
+    return "<h1>RoamNERd API</h1>"
 
 # Some Flask stuff I don't quite understand
 if __name__ == "__main__":
