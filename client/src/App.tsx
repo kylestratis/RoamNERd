@@ -2,17 +2,13 @@ import React, { useState } from "react";
 import "./App.scss";
 import styled from "styled-components";
 import Button from "./Button";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import InputZone from "./InputZone";
 
 const Main = styled.main`
   max-width: 1000px;
   min-height: calc(84vh - ${(props) => props.theme.spacer * 6}px);
   margin: 0 auto;
   padding: ${(props) => props.theme.spacer * 3}px;
-`;
-
-const BtnIcon = styled(FontAwesomeIcon)`
-  margin-right: ${(props) => props.theme.spacer}px;
 `;
 
 const Form = styled.form`
@@ -23,36 +19,21 @@ const Form = styled.form`
 
 const IOSection = styled.div`
   flex-grow: 1;
-  margin: 0 ${(props) => props.theme.spacer}px;
-`;
-
-const IOSectionActionBar = styled.div`
-  margin-bottom: ${(props) => props.theme.spacer}px;
-`;
-
-const InputTextarea = styled.textarea`
-  display: block;
-  outline: none;
+  width: 300px;
   height: 400px;
-  width: 100%;
-  resize: none;
+  display: flex;
+  flex-direction: column;
+  margin: 0 ${(props) => props.theme.spacer}px;
   padding: ${(props) => props.theme.spacer * 2}px;
   box-sizing: border-box;
   border-radius: ${(props) => props.theme.spacer}px;
   border: 1px solid ${(props) => props.theme.color.primary};
-  overflow-y: auto;
-  font-size: 12px;
-  font-family: serif;
-  color: black;
 `;
+
+const IOSectionActionBar = styled.div``;
 
 const OutputZone = styled.div`
-  height: 400px;
-  width: 100%;
-  padding: ${(props) => props.theme.spacer * 2}px;
-  box-sizing: border-box;
-  border-radius: ${(props) => props.theme.spacer}px;
-  border: 1px solid ${(props) => props.theme.color.primary};
+  flex-grow: 1;
   overflow-y: auto;
   font-size: 12px;
   font-family: serif;
@@ -76,38 +57,28 @@ function App() {
     <Main>
       <Form onSubmit={onSubmit}>
         <IOSection>
-          <IOSectionActionBar>
-            <Button theme="secondary" type="submit">
-              <BtnIcon icon="upload" />
-              Upload Text
-            </Button>{" "}
-            or paste below
-          </IOSectionActionBar>
-          <InputTextarea
-            value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
-            id="input"
-            placeholder="Input..."
-          />
+          <InputZone text={inputText} setText={setInputText} />
         </IOSection>
         <Actions>
-          <Button type="submit" disabled={!hasInput}>
-            <BtnIcon icon="cogs" />
+          <Button icon="cogs" type="submit" disabled={!hasInput}>
             Process Text
           </Button>
         </Actions>
         <IOSection>
+          <OutputZone>Tagged output will go here</OutputZone>
           <IOSectionActionBar>
-            <Button theme="secondary" type="submit" disabled={!hasOutput}>
-              <BtnIcon icon="download" />
+            <Button
+              icon="download"
+              theme="secondary"
+              type="submit"
+              disabled={!hasOutput}
+            >
               Download as .md
             </Button>
-            <Button theme="secondary" disabled={!hasOutput}>
-              <BtnIcon icon="copy" />
+            <Button icon="copy" theme="secondary" disabled={!hasOutput}>
               Copy Output
             </Button>
           </IOSectionActionBar>
-          <OutputZone>Tagged output will go here</OutputZone>
         </IOSection>
       </Form>
     </Main>

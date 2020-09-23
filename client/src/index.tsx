@@ -13,9 +13,10 @@ import {
   faDownload,
   faCopy,
   faCogs,
+  faTimes,
 } from "@fortawesome/free-solid-svg-icons";
 
-library.add(faSpinner, faUpload, faDownload, faCopy, faCogs);
+library.add(faSpinner, faUpload, faDownload, faCopy, faCogs, faTimes);
 
 const theme = {
   spacer: 8,

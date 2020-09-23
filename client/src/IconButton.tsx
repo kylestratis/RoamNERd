@@ -1,16 +1,11 @@
 import React from "react";
 import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { IconProp } from "@fortawesome/fontawesome-svg-core";
+import { IconProp, SizeProp } from "@fortawesome/fontawesome-svg-core";
 
-const BtnIcon = styled(FontAwesomeIcon)`
-  margin-right: ${(props) => props.theme.spacer}px;
-`;
-
-const ButtonTag = styled.button<{ btnTheme: string }>`
-  border: 1px solid black;
-  border-radius: ${(props) => props.theme.spacer}px;
-  padding: ${(props) => props.theme.spacer}px;
+const ButtonTag = styled.button<{ btnTheme?: string }>`
+  border: none;
+  padding: ${(props) => props.theme.spacer / 2}px;
   font-size: 14px;
   cursor: pointer;
 
@@ -40,47 +35,57 @@ const ButtonTag = styled.button<{ btnTheme: string }>`
         return `
             background-color: ${props.theme.color.secondary};
             color: black;
+            border: 1px solid black;
+            border-radius: 50%;
         `;
       case "secondary":
         return `
             background-color: ${props.theme.color.primary};
             color: white;
+            border: 1px solid black;
+            border-radius: 50%;
         `;
+      default:
+        return `
+            background-color: transparent;
+            color: black;
+      `;
     }
   }}
 `;
 
-function Button({
+function IconButton({
   onClick,
   type = "button",
-  theme = "primary",
+  theme,
   disabled = false,
-  children,
   icon,
   className,
+  fixedWidth,
+  size,
 }: Props) {
   return (
     <ButtonTag
+      className={className}
       onClick={!disabled ? onClick : () => {}}
       type={type}
       btnTheme={theme}
       disabled={disabled}
-      className={className}
     >
-      {icon && <BtnIcon icon={icon} />}
-      {children}
+      <FontAwesomeIcon icon={icon} fixedWidth={fixedWidth} size={size} />
     </ButtonTag>
   );
 }
 
 type Props = {
   onClick?: () => void;
+  className?: string;
   disabled?: boolean;
   type?: "button" | "submit" | "reset";
   theme?: "primary" | "secondary";
-  children?: React.ReactNode;
-  icon?: IconProp;
-  className?: string;
+  icon: IconProp;
+  fixedWidth?: boolean;
+  size: SizeProp;
 };
 
-export default Button;
+export default IconButton;
