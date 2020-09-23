@@ -12,7 +12,6 @@ CORS(app)
 
 @app.route("/tagText", methods=["POST"])
 def tag_text():
-    pdb.set_trace()
     if request.method == 'POST':
         posted_text = request.get_json()
         text = posted_text["text"]
