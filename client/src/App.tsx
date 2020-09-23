@@ -79,10 +79,10 @@ function App() {
         body: JSON.stringify({
           text: inputText,
         }),
-        mode: "no-cors",
+        mode: "cors",
       });
-      const json = await res.json();
-      console.log(json);
+      const text = await res.text();
+      setOutputText(text);
     } catch (e) {
       console.log(e);
       addToast("A server error occured, sorry about that", {
