@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./App.scss";
 import styled from "styled-components";
 import { useToasts } from "react-toast-notifications";
@@ -64,6 +64,28 @@ function App() {
   const hasInput = inputText.length > 0;
   const [outputText, setOutputText] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isInputCapped, setIsInputCapped] = useState(false);
+  const [wordCount, setWordCount] = useState(0);
+
+  useEffect(() => {
+    // doing this in a sideeffect as it could be laggy
+    var numTokens = 0;
+    if (inputText.length === 0) {
+      numTokens = 0;
+    } else {
+      numTokens = inputText.split(" ").length;
+    }
+    setWordCount(numTokens);
+    setIsInputCapped(numTokens > 7_500);
+  }, [inputText]);
+
+  const setTextWrapper = (newText: string) => {
+    if (isInputCapped && newText.length > inputText.length) {
+      return;
+    } else {
+      setInputText(newText);
+    }
+  };
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault(); // normally forms submit a POST request and refresh the page
@@ -101,15 +123,17 @@ function App() {
         <IOSection>
           <InputZone
             text={inputText}
-            setText={setInputText}
+            setText={setTextWrapper}
             frozen={isProcessing}
+            inputCapped={isInputCapped}
+            wordCount={wordCount}
           />
         </IOSection>
         <Actions>
           <Button
             icon="cogs"
             type="submit"
-            disabled={!hasInput}
+            disabled={!hasInput || isInputCapped}
             loading={isProcessing}
             loadingContent="Processing..."
           >

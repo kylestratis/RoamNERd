@@ -38,11 +38,17 @@ const Disclaimer = styled.p`
 const PLACEHOLDER_MD = `
 **\\[\\[RoamNERd\\]\\]** uses \\[\\[named entity recognition\\]\\] to tag entities so you can seamlessly import text into \\[\\[Roam Research\\]\\].
 
-Usage:
-
-1. Enter or upload some text
-2. Hit "Process Text"
-3. Export using the buttons below
+- Usage:
+  1. Enter or upload some text
+  2. Hit "Process Text"
+  3. Export using the buttons below
+- Some ideas for using RoamNERd:
+    - Researcher? 
+        - Run your research through RoamNERd to start drawing references across different papers and text corpuses
+    - Readwise (or similar) workflow? 
+        - Run your highlights and notes through RoamNERd and enhance the depth of your graph
+    - News junkie?
+        - Run any articles you would import to Roam through RoamNERd first and get a set of automatic tags which you can add to
 `;
 
 function OutputZone({ text }: Props) {
