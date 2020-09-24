@@ -1,2 +1,3 @@
 # RoamNERd
-_A tool for automatically marking up raw text for use in Roam Research_
+_A web tool for Named Entity Rcognition in Roam Research__  
+![](https://i.gyazo.com/cb7705c993acd210fd3804bc9193ea1f.gif)
