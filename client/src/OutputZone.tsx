@@ -48,7 +48,7 @@ const PLACEHOLDER_MD = `
     - Readwise (or similar) workflow? 
         - Run your highlights and notes through RoamNERd and enhance the depth of your graph
     - News junkie?
-        - Run any articles you would import to Roam through RoamNERd first and get a set of automatic tags which you can add to
+        - Run any articles you would import to Roam through RoamNERd first and get a set of automatic tags which you can add to your graph
 `;
 
 function OutputZone({ text }: Props) {
