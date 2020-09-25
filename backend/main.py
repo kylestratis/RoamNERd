@@ -26,9 +26,9 @@ def main(rawInput):
     spacyCategories = ["PERSON", "DATE", "LOC", "EVENT", "ORG","GPE"]
     readableCategories = ["People", "Dates", "Locations", "Organisations", "Geopolitical Entities"]
 
-    # We should also generate a dictionary of roam pages by category where we can store our tags in plaintext
+    # We should also generate a dictionary of roam backLinks by category where we can store our tags in plaintext
     # This will make it easier to count our tags later on.
-    pages = {
+    backLinks = {
             "People" : [],
              "Dates" : [],
              "Locations" : [],
@@ -37,10 +37,10 @@ def main(rawInput):
              }
 
 
-    # Finally, we're also going to make a list of removed pages - this is so we
+    # Finally, we're also going to make a list of removed backLinks - this is so we
     # have to cross reference our whole doc if we remove tag but it keeps popping up.
     # We don't have to worry about sorting this one by category.
-    removedPages = []
+    removedBackLinks = []
     ## Loop through our identified words
     for word in doc.ents:
 
@@ -51,51 +51,52 @@ def main(rawInput):
         # I though about implementing a switch statement in python, but they're not
         # terribly readable in Python. We'll go with elifs
         if (word.label_ == "PERSON"):
-            processPerson(word, doc, pages["People"], removedPages)
+            processPerson(word, doc, backLinks["People"], removedBackLinks)
         elif (word.label_ == "DATE"):
-            processDate(word, doc, pages["Dates"], removedPages)
+            processDate(word, doc, backLinks["Dates"], removedBackLinks)
         elif (word.label_ == "LOC"):
-            processDefault(word, doc, pages["Locations"], pages, readableCategories, removedPages)
+            processDefault(word, doc, backLinks["Locations"], backLinks, readableCategories, removedBackLinks)
         elif (word.label_ == "ORG"):
-            processDefault(word, doc, pages["Organisations"], pages, readableCategories, removedPages, )
+            processDefault(word, doc, backLinks["Organisations"], backLinks, readableCategories, removedBackLinks, )
         elif (word.label_ == "GPE"):
-            processDefault(word, doc, pages["Geopolitical Entities"], pages, readableCategories, removedPages)
+            processDefault(word, doc, backLinks["Geopolitical Entities"], backLinks, readableCategories, removedBackLinks)
 
-    annotatedText = docToRoam(doc, pages)
-    return(generateMarkdown(annotatedText, pages))
+    annotatedText = docToRoam(doc, backLinks)
+    annotatedText = generateMarkdown(annotatedText, backLinks)
+    return({"text" : annotatedText, "backLinks" : backLinks})
 
 ## A function for processing people identified by our model. Handles repeats, mononyms, honorifics
 ## and misattribution
-def processPerson(person, doc, pages, removedPages):
+def processPerson(person, doc, backLinks, removedBackLinks):
 
     # A generic list of common english-language honorifics
     honorifics = ["Mr", "Mr.", "Ms", "Ms.", "Mrs", "Mrs."]
 
     # First, lets check for repeats:
-    if person.text in pages:
+    if person.text in backLinks:
         return
 
     ## Handle punctuation first - this is a bit lazy and deserves revisiting but:
     ## if the final character is punctuation, we'll just throw it out. I guess we can call
     ## it a misattribution.
     if (person[-1].pos_ == "PUNCT"):
-        removedPages.append(person.text)
+        removedBackLinks.append(person.text)
         return
 
     # Handling mononyms - if a more specific version of the same name exists in doc, return.
-    if len(person) == 1 and person.text not in removedPages:
+    if len(person) == 1 and person.text not in removedBackLinks:
 
        # Let's grab a list of all people in the doc, and we can cross-reference names.
        people = [ent for ent in doc.ents if ent.label_ == "PERSON"]
        for entry in people:
            # Let's look at every name in our list, and see if they share a last name with our mononym. If so,
-           # we'll remove the mononym and add it do the removedPages list, Else, we add it
+           # we'll remove the mononym and add it do the removedBackLinks list, Else, we add it
            if entry[-1].text == person.text:
-               removedPages.append(person.text)
+               removedBackLinks.append(person.text)
                return
 
            if entry[0].text == person.text:
-               removedPages.append(person.text)
+               removedBackLinks.append(person.text)
                return
 
 
@@ -106,48 +107,48 @@ def processPerson(person, doc, pages, removedPages):
        people = [ent for ent in doc.ents if ent.label_ == "PERSON"]
        for entry in people:
            if(entry[-1].text == person[-1].text):
-               removedPages.append(person.text)
+               removedBackLinks.append(person.text)
                return
 
     # Checking that our names aren't all caps or all lower-case:
     for word in person:
         if (word.text == word.text.upper() or word.text == word.text.lower()):
-            removedPages.append(person.text)
+            removedBackLinks.append(person.text)
             return
 
     ## And finally, if we haven't filtered the tag out, we can add it as a page
-    pages.append(person.text)
+    backLinks.append(person.text)
     return
 
 ## A function for processing dates identified by our model. Filters out dates that can't be parsed sensibly
 ## by dateutil
-def processDate(date, doc, pages, removedPages):
+def processDate(date, doc, backLinks, removedBackLinks):
     # Add more edge case handling in future!
-    if(date.text in removedPages or date.text in pages):
+    if(date.text in removedBackLinks or date.text in backLinks):
         return
     if(len(date.text) < 4):
         return
     try:
         parse(date.text)
-        pages.append(date.text)
+        backLinks.append(date.text)
         print(dateObject)
 
     except:
-        removedPages.append(date.text)
+        removedBackLinks.append(date.text)
         return
 
 ## A default processing function for categories we haven't mapped edge
 ## cases for yet. Does basic grammatic / logical filtering, and makes sure it's
 ## results don't show up in other lists.
-def processDefault(word, doc, pages, pageDictionary, categories, removedPages):
+def processDefault(word, doc, backLinks, pageDictionary, categories, removedBackLinks):
 
-    if word.text in removedPages or word.text in pages:
+    if word.text in removedBackLinks or word.text in backLinks:
         return
 
     # Check capitalisation
     for token in word:
         if (word.text == word.text.upper() or word.text == word.text.lower()):
-            removedPages.append(word.text)
+            removedBackLinks.append(word.text)
             return
 
     # Check page doesn't already exist in wider dictionary
@@ -155,12 +156,10 @@ def processDefault(word, doc, pages, pageDictionary, categories, removedPages):
         for page in pageDictionary[category]:
             for token in page.split(" "):
                 if word[-1].text == token:
-                    removedPages.append(word.text)
+                    removedBackLinks.append(word.text)
                     return
 
-
-
-    pages.append(word.text)
+    backLinks.append(word.text)
     return
 
 ## Takes a given string and converts it into a Roam page: "Roam" -> "[[Roam]]"
@@ -168,13 +167,13 @@ def roamPagify(string):
     return "[["+string+"]]"
 
 ## Writes from doc to roam output. Returns a string
-def docToRoam(doc, pages):
+def docToRoam(doc, backLinks):
 
     roamOut = []
     sentences = doc.sents
 
     allPages = []
-    for page in pages.values():
+    for page in backLinks.values():
         allPages += page
 
     for sentence in sentences:
@@ -196,17 +195,17 @@ def docToRoam(doc, pages):
     return("\n   - ".join(roamOut))
 
 ## Generates a .md string with header
-def generateMarkdown(text, pages):
+def generateMarkdown(text, backLinks):
 
     # Building the header
     markdownRaw = "***Tags:**\n"
-    for category in pages.items():
+    for category in backLinks.items():
         if(len(category[1]) == 0):
             continue
         ## First, lets make the category label and the count
         markdownRaw += "    - " + "__"+category[0]+"__" + ": " + str(len(category[1])) + "  \n"
 
-        ## Now, we can add our list of pages, formatted as a string
+        ## Now, we can add our list of backLinks, formatted as a string
         pageString = []
         for page in category[1]:
             pageString.append(roamPagify(page))
@@ -214,7 +213,7 @@ def generateMarkdown(text, pages):
 
         markdownRaw += "        - "+pageString + "  \n"
 
-    ## Now, lets add our raw roam blocks + pages
+    ## Now, lets add our raw roam blocks + backLinks
     markdownRaw += "***Raw Text:** " + "  \n" + "    - " + text
     return markdownRaw
 
