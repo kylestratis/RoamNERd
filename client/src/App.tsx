@@ -105,8 +105,8 @@ function App() {
         }),
         mode: "cors",
       });
-      const text = await res.text();
-      setOutputText(text);
+      const text = await res.json();
+      setOutputText(text.text);
     } catch (e) {
       console.log(e);
       addToast("A server error occured, sorry about that", {
