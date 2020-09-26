@@ -33,7 +33,8 @@ const Form = styled.form`
 
 const IOSection = styled.div`
   flex-grow: 1;
-  width: 400px;
+  width: 25%;
+  min-width: 400px;
   height: 400px;
   display: flex;
   flex-direction: column;
