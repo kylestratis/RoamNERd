@@ -1,18 +1,6 @@
 ## Imports
 import spacy
 from dateutil.parser import parse
-from flask import Flask, request
-from flask_cors import CORS
-
-app = Flask(__name__)
-CORS(app)
-
-@app.route("/tagText", methods=["POST"])
-def tag_text():
-    if request.method == 'POST':
-        posted_text = request.get_json()
-        text = posted_text["text"]
-        return main(text)
 
 ## Our main function, and how you access our backend. For now, we only
 ## pass it text but eventually it will also parse a bunch of optional args
@@ -216,12 +204,3 @@ def generateMarkdown(text, backLinks):
     ## Now, lets add our raw roam blocks + backLinks
     markdownRaw += "***Raw Text:** " + "  \n" + "    - " + text
     return markdownRaw
-
-# api index page
-@app.route('/')
-def index():
-    return "<h1>RoamNERd API</h1>"
-
-# Some Flask stuff I don't quite understand
-if __name__ == "__main__":
-    app.run(debug=True)
